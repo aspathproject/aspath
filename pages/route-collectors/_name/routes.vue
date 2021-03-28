@@ -4,13 +4,20 @@
       <h3 class="mb-4">
         Filters:
       </h3>
+
+      <v-text-field
+        v-model="cidrBlockFilter"
+        label="IP Block:"
+        outlined
+        clearable
+        :rules="[validCIDR]"
+      />
       <v-text-field
         v-model="asPathFilter"
         label="AS Path contains:"
         outlined
         clearable
       />
-
       <v-text-field
         v-model="originFilter"
         label="Origin AS:"
@@ -94,6 +101,7 @@
 </template>
 
 <script>
+import * as ipaddr from 'ipaddr.js'
 
 export default {
   components: {
@@ -103,6 +111,9 @@ export default {
     loading: true,
     originFilter: null,
     asPathFilter: null,
+    cidrBlockFilter: null,
+    validatedCIDRBlock: null,
+    validatedCIDRBlocky: false,
     minPrefixLength: 1,
     maxPrefixLength: 48,
     prefixLengthRange: [1, 48]
@@ -129,12 +140,38 @@ export default {
       }).filter((route) => {
         const prefixLength = parseInt(route.block.split('/')[1])
         return (this.prefixLengthRange[0] <= prefixLength) && (prefixLength <= this.prefixLengthRange[1])
+      }).filter((route) => {
+        if (this.validatedCIDRBlock) {
+          try {
+            const cidr = ipaddr.IPv4.networkAddressFromCIDR(route.block)
+            return cidr.match(this.validatedCIDRBlock)
+          } catch (error) {
+            return false
+          }
+        }
+        return true
       })
     }
   },
-  created: () => ({
+  watch: {
 
-  })
+  },
+  created: () => ({
+  }),
+  methods: {
+    validCIDR (value) {
+      if (!value || value.length === 0) {
+        this.validatedCIDRBlock = null
+        return true
+      }
+      try {
+        this.validatedCIDRBlock = ipaddr.parseCIDR(value)
+        return true
+      } catch (error) {
+        return 'not a valid CIDR'
+      }
+    }
+  }
 }
 </script>
 
