@@ -12,7 +12,9 @@
         <v-btn
           v-for="(item, i) in items"
           :key="i"
+          :to="item.to"
           text
+          class="mr-1"
         >
           {{ item.title }}
         </v-btn>
@@ -73,6 +75,11 @@ export default {
           icon: 'mdi-apps',
           title: 'Home',
           to: '/'
+        },
+        {
+          icon: 'mdi-chart-bubble',
+          title: 'Internet Exchanges',
+          to: '/internet-exchanges'
         },
         {
           icon: 'mdi-chart-bubble',
