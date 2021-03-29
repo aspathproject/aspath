@@ -113,7 +113,6 @@ export default {
     asPathFilter: null,
     cidrBlockFilter: null,
     validatedCIDRBlock: null,
-    validatedCIDRBlocky: false,
     minPrefixLength: 1,
     maxPrefixLength: 48,
     prefixLengthRange: [1, 48]
