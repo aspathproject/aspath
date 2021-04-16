@@ -1,14 +1,18 @@
-name: ci
+name: Frontend CI
 
 on:
   push:
     branches:
       - develop
+    paths:
+      - "frontend/**"
   pull_request:
     branches:
       - main
       - master
       - develop
+    paths:
+      - "frontend/**"
 
 jobs:
   ci:
@@ -42,8 +46,8 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install dependencies 👨🏻‍💻
-        run: yarn
+        run: cd frontend && yarn
 
       - name: Run linter 👀
-        run: yarn lint
+        run: cd frontend && yarn lint
 
