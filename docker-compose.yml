@@ -1,0 +1,78 @@
+version: '3'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    depends_on:
+      - timescaledb
+      - redis
+    networks:
+      - backend
+    volumes:
+      - ./backend/app:/app
+    entrypoint: /start-reload.sh
+    ports:
+      - "8000:80"
+
+  frontend:
+    build:
+      context: ./frontend
+    depends_on:
+      - backend
+    networks:
+      - frontend
+    # volumes:
+    #   - ./frontend:/app
+    ports:
+      - "8080:8080"
+
+  celerybeat:
+    entrypoint: /start_celerybeat.sh
+    build:
+      context: ./backend
+    depends_on:
+      - redis
+    volumes:
+      - ./backend/app:/app
+    networks:
+      - backend
+
+  celery_worker:
+    entrypoint: /start_celery.sh
+    build:
+      context: ./backend
+    depends_on:
+      - redis
+    volumes:
+      - ./backend/app:/app
+    networks:
+      - backend
+
+  timescaledb:
+    image: timescale/timescaledb:2.1.1-pg13
+    networks:
+      backend:
+        aliases:
+          - postgres
+    volumes:
+      - ./data/db_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_DB=aspath
+    ports:
+      - "5431:5432"
+
+  redis:
+    image:
+      redis:6.2.1-alpine
+    networks:
+      - backend
+    volumes:
+      - ./data/redis_data:/data
+
+networks:
+  backend:
+    name: backend-net
+  frontend:
+    name: frontend-net
