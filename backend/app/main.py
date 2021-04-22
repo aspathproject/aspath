@@ -74,6 +74,20 @@ def get_route_collector_snapshots(collector_name: str):
 
     return QueryBuilder().table("routing_snapshots").select('id, created_at').where({'route_collector_id': route_collector_id, 'status': 'parsed'}).get()
 
+@app.get("/route-collectors/{collector_name}/snapshots/latest/routes")
+def get_snapshot_routes(collector_name: str):
+    route_collector = QueryBuilder().table("route_collectors").where('name', collector_name).first()
+    if not route_collector:
+      raise HTTPException(status_code=404, detail="Route Collector not found")
+    route_collector_id = route_collector["id"]
+
+    snapshot = QueryBuilder().table("routing_snapshots").where('route_collector_id', route_collector_id).last('id')
+    if not snapshot:
+      raise HTTPException(status_code=404, detail="Routing snapshot not found")
+
+    return QueryBuilder().table("ip_routes").where({'created_at': snapshot['created_at'], 'snapshot_id': snapshot['id']}).get()
+
+
 @app.get("/route-collectors/{collector_name}/snapshots/{snapshot_id}/routes")
 def get_snapshot_routes(collector_name: str, snapshot_id: int):
     route_collector = QueryBuilder().table("route_collectors").where('name', collector_name).first()
@@ -85,10 +99,23 @@ def get_snapshot_routes(collector_name: str, snapshot_id: int):
     if not snapshot:
       raise HTTPException(status_code=404, detail="Routing snapshot not found")
 
-    return QueryBuilder().table("ip_routes").where({'created_at': snapshot['created_at'], 'snapshot_id': snapshot['id']}).get()
+    query = """SELECT "ip_routes"."block", "ip_routes"."path", path->>-1 origin, "autonomous_systems"."name"
+FROM "ip_routes", "autonomous_systems"
+WHERE "ip_routes"."created_at" = '?'
+AND cast(nullif("ip_routes"."path"->>-1, '') as int) = "autonomous_systems"."number"
+AND "ip_routes"."snapshot_id" = '?'
+    """
+    return QueryBuilder().statement(query, [snapshot['created_at'], snapshot['id']])
+    return QueryBuilder().table("ip_routes").select('block', 'path').select_raw('path->>-1 origin').where({'created_at': snapshot['created_at'], 'snapshot_id': snapshot['id']}).get()
+
+@app.get("/statistics")
+def get_database_statistics():
+    route_collector_count = QueryBuilder().table("route_collectors").count()
+    ixp_count = QueryBuilder().table("internet_exchange_points").count()
+    routing_snapshots_count = QueryBuilder().table("routing_snapshots").count()
+    autonomous_systems_count = QueryBuilder().table("autonomous_systems").count()
+    return {'route_collector_count': route_collector_count,
+            'snapshots_count': routing_snapshots_count, 'autonomous_systems': autonomous_systems_count,
+            'ixp_count': ixp_count }
 
 
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str = None):
-    return {"item_id": item_id, "q": q}
