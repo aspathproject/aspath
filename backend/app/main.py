@@ -1,11 +1,20 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from masoniteorm.query import QueryBuilder
 from brotli_asgi import BrotliMiddleware
 from redisbeat.scheduler import RedisScheduler
+from config.database import DB
 import worker
 
 app = FastAPI()
 app.add_middleware(BrotliMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 scheduler = RedisScheduler(app=worker.app)
 
