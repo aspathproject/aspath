@@ -36,8 +36,29 @@ def wipe_scheduler():
 
 @app.get("/exchange-points/")
 def exchange_points_index():
-    builder = QueryBuilder().table("internet_exchange_points")
-    return builder.all()
+    exchange_points = {}
+    ixp_results = QueryBuilder().table("internet_exchange_points").get()
+
+    for ixp in ixp_results:
+      exchange_points[ixp['id']] = ixp
+      route_collectors = QueryBuilder().table("route_collectors").select('id', 'name').where('ixp_id', ixp['id']).get()
+      route_collectors_dict = {}
+
+      for collector in route_collectors:
+        route_collectors_dict[collector['id']] = collector['name']
+      collector_ids = [collector['id'] for collector in route_collectors ]
+
+      # identify the route collector that has the last saved snapshot
+      last_update = QueryBuilder().table("routing_snapshots").select('route_collector_id', 'id, created_at').where_in('route_collector_id', collector_ids) \
+                      .order_by('created_at', 'desc') \
+                      .limit(1).first()
+      print(last_update['created_at'])
+
+      exchange_points[ixp['id']]['route_collectors'] = len(collector_ids)
+      exchange_points[ixp['id']]['last_snapshot_date'] = last_update['created_at'].strftime('%Y-%m-%d')
+      exchange_points[ixp['id']]['last_snapshot_id'] = last_update['id']
+      exchange_points[ixp['id']]['last_snapshot_collector_name'] = route_collectors_dict[last_update['route_collector_id']]
+    return exchange_points
 
 @app.get("/route-collectors/")
 def route_collectors_index():
