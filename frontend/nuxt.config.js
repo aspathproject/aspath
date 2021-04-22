@@ -2,12 +2,13 @@ import colors from 'vuetify/es5/util/colors'
 
 export default {
   // Target: https://go.nuxtjs.dev/config-target
+  ssr: false,
   target: 'static',
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - aspath-frontend',
-    title: 'aspath-frontend',
+    titleTemplate: '%s - ASPATH',
+    title: 'ASPATH - Route Collector Monitoring Tool',
     htmlAttrs: {
       lang: 'en'
     },
@@ -42,7 +43,12 @@ export default {
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
+    '@nuxt/http'
   ],
+
+  http: {
+    baseURL: 'http://backend:80'
+  },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
