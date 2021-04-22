@@ -1,89 +1,80 @@
 <template>
-  <v-row justify="center" align="center">
-    <v-col cols="12" sm="8" md="6">
-      <div class="text-center">
-        <logo />
-        <vuetify-logo />
-      </div>
-      <v-card>
-        <v-card-title class="headline">
-          Welcome to the Vuetify + Nuxt.js template
-        </v-card-title>
-        <v-card-text>
-          <p>Vuetify is a progressive Material Design component framework for Vue.js. It was designed to empower developers to create amazing applications.</p>
-          <p>
-            For more information on Vuetify, check out the <a
-              href="https://vuetifyjs.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              documentation
-            </a>.
-          </p>
-          <p>
-            If you have questions, please join the official <a
-              href="https://chat.vuetifyjs.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="chat"
-            >
-              discord
-            </a>.
-          </p>
-          <p>
-            Find a bug? Report it on the github <a
-              href="https://github.com/vuetifyjs/vuetify/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="contribute"
-            >
-              issue board
-            </a>.
-          </p>
-          <p>Thank you for developing with Vuetify and I look forward to bringing more exciting features in the future.</p>
-          <div class="text-xs-right">
-            <em><small>&mdash; John Leider</small></em>
+  <div>
+    <v-card>
+      <v-card-title class="headline">
+        ASPATH Pre-release
+      </v-card-title>
+      <v-card-text>
+        <p>
+          <b>Warning:</b>
+          Unexpected software behavior should definitely be expected on alpha builds. Kindly submit an issue on
+          <a href="https://github.com/aspathproject/aspath/issues">ASPATH Github repo</a>
+          in case a bug is discovered.
+        </p>
+      </v-card-text>
+    </v-card>
+    <h2 class="mt-2">Database Statistics</h2>
+    <div v-if="statistics" style="display: flex">
+      <div style="display: flex">
+        <v-card class="my-2 mr-2 text-center">
+          <div
+            class="pa-2 py-4"
+            style="display: flex; flex-direction: column; align-items: center; max-width: 200px;"
+          >
+            <span style="font-weight:900; font-size: 48px;">{{ statistics.route_collector_count }}</span>
+            <span>Route collectors</span>
           </div>
-          <hr class="my-3">
-          <a
-            href="https://nuxtjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
+        </v-card>
+      </div>
+      <div style="display: flex">
+        <v-card class="my-2 mr-2 text-center">
+          <div
+            class="pa-2 py-4"
+            style="display: flex; flex-direction: column; align-items: center; max-width: 200px;"
           >
-            Nuxt Documentation
-          </a>
-          <br>
-          <a
-            href="https://github.com/nuxt/nuxt.js"
-            target="_blank"
-            rel="noopener noreferrer"
+            <span style="font-weight:900; font-size: 48px;">{{ statistics.ixp_count }}</span>
+            <span>Internet Exchange Points</span>
+          </div>
+        </v-card>
+      </div>
+      <div>
+        <v-card class="my-2 mr-2 text-center">
+          <div
+            class="pa-2 py-4"
+            style="display: flex; flex-direction: column; align-items: center; max-width: 200px;"
           >
-            Nuxt GitHub
-          </a>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            color="primary"
-            nuxt
-            to="/inspire"
+            <span style="font-weight:900; font-size: 48px;">{{ statistics.snapshots_count }}</span>
+            <span>Routing snapshots</span>
+          </div>
+        </v-card>
+      </div>
+      <div>
+        <v-card class="my-2 mr-2 text-center">
+          <div
+            class="pa-2 py-4"
+            style="display: flex; flex-direction: column; align-items: center; max-width: 200px;"
           >
-            Continue
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-col>
-  </v-row>
+            <span style="font-weight:900; font-size: 48px;">{{ statistics.autonomous_systems }}</span>
+            <span>Autonomous Systems</span>
+          </div>
+        </v-card>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
-import VuetifyLogo from '~/components/VuetifyLogo.vue'
 
 export default {
   components: {
-    Logo,
-    VuetifyLogo
+  },
+  data () {
+    return {
+      statistics: null
+    }
+  },
+  async fetch () {
+    this.statistics = await this.$http.$get('/statistics')
   }
 }
 </script>
