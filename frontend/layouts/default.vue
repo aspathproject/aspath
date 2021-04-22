@@ -39,6 +39,7 @@
             <v-col>
               <v-breadcrumbs
                 class="pl-1 pt-0 pb-0 breadcrumbs"
+                style="color: white;"
                 :items="crumbs"
                 divider="-"
               />
@@ -112,7 +113,8 @@ export default {
 }
 </script>
 <style>
-a.v-breadcrumbs__item {
-  color: black;
+
+a.v-breadcrumbs__item{
+  color: black!important;
 }
 </style>
