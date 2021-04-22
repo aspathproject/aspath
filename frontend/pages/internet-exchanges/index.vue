@@ -15,7 +15,7 @@
         <v-col>
           <v-row
             v-for="exchange in internet_exchanges"
-            :key="exchange.name"
+            :key="exchange.id"
           >
             <v-col>
               <NuxtLink :to="exchange.slug" style="text-decoration: none">
@@ -51,11 +51,16 @@
                           route collectors: <span>{{ exchange.route_collectors }}</span>
                         </p>
                         <p class="mb-0">
-                          prefixes: <span>{{ exchange.prefix_count }}</span>
+                          last updated: <span>{{ exchange.last_snapshot_date }}</span>
                         </p>
-                        <p class="mb-0">
-                          last updated: <span>{{ exchange.last_snapshot }}</span>
-                        </p>
+                      </v-col>
+                      <v-col v-if="exchange.last_snapshot_collector_name">
+                        <NuxtLink
+                          style="text-decoration: none; color: inherit;"
+                          :to="'/route-collectors/' + exchange.last_snapshot_collector_name + '/routes?snapshot=' + exchange.last_snapshot_id"
+                        >
+                          <v-btn>Go to last snapshot</v-btn>
+                        </NuxtLink>
                       </v-col>
                     </v-row>
                   </v-card>
@@ -91,6 +96,9 @@ export default {
         slug: 'ix-br'
       }
     ]
-  })
+  }),
+  async fetch () {
+    this.internet_exchanges = await this.$http.$get('/exchange-points')
+  }
 }
 </script>
