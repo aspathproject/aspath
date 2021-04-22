@@ -118,15 +118,22 @@ export default {
     prefixLengthRange: [1, 48]
   }),
   async fetch () {
-    this.announcements = await fetch(
-      'http://localhost:3000/announcements.json'
-    ).then(res => res.json())
+    this.announcements = await this.$http.$get(
+      `/route-collectors/${this.$route.params.name}/snapshots/${this.$route.query.snapshot}/routes`
+    )
+
+    if (!this.announcements) {
+      this.$nuxt.error({ statusCode: 404, message: 'Data not found' })
+    }
   },
   computed: {
     filteredRoutes () {
+      if (!this.announcements) {
+        return []
+      }
       return this.announcements.filter((route) => {
         if (this.originFilter) {
-          const originName = route.name.toLowerCase()
+          const originName = route.name ? route.name.toLowerCase() : ''
           return route.origin === this.originFilter || originName.includes(this.originFilter.toLowerCase())
         }
         return true
@@ -155,8 +162,11 @@ export default {
   watch: {
 
   },
-  created: () => ({
-  }),
+  created () {
+    if (!this.$route.query.snapshot) {
+      this.$router.push({ query: { snapshot: 'latest' } })
+    }
+  },
   methods: {
     validCIDR (value) {
       if (!value || value.length === 0) {
