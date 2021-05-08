@@ -73,7 +73,7 @@ def get_route_collector_snapshots(collector_name: str):
       raise HTTPException(status_code=404, detail="Route Collector not found")
     route_collector_id = route_collector["id"]
 
-    return QueryBuilder().table("routing_snapshots").select('id, created_at').where({'route_collector_id': route_collector_id, 'status': 'parsed'}).get()
+    return QueryBuilder().table("routing_snapshots").select('id, created_at').where({'route_collector_id': route_collector_id, 'status': 'parsed'}).order_by('created_at', 'desc').get()
 
 @app.get("/route-collectors/{collector_name}/snapshots/latest/routes")
 def get_snapshot_routes(collector_name: str):
