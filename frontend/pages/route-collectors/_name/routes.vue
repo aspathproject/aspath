@@ -1,103 +1,111 @@
 <template>
-  <v-row justify="center" align="start">
-    <v-col md="4">
-      <h3 class="mb-4">
-        Filters:
-      </h3>
+  <div>
+    <div class="heading mb-2" style="display: flex; place-content: space-between; align-items: center;">
+      <h1>Snapshot Routes</h1>
+      <p class="mb-0">
+        Current snapshot: {{ createdAt }}
+      </p>
+    </div>
+    <v-row justify="center" align="start">
+      <v-col md="3">
+        <h3 class="mb-4">
+          Filters:
+        </h3>
 
-      <v-text-field
-        v-model="cidrBlockFilter"
-        label="IP Block:"
-        outlined
-        clearable
-        :rules="[validCIDR]"
-      />
-      <v-text-field
-        v-model="asPathFilter"
-        label="AS Path contains:"
-        outlined
-        clearable
-      />
-      <v-text-field
-        v-model="originFilter"
-        label="Origin AS:"
-        outlined
-        clearable
-      />
-      <p>Prefix Length:</p>
-      <v-range-slider
-        v-model="prefixLengthRange"
-        :max="maxPrefixLength"
-        :min="minPrefixLength"
-        hide-details
-        class="align-center"
-      >
-        <template #prepend>
-          <v-text-field
-            :value="prefixLengthRange[0]"
-            class="mt-0 pt-0"
-            hide-details
-            single-line
-            type="number"
-            style="width: 60px"
-            @change="$set(prefixLengthRange, 0, $event)"
-          />
-        </template>
-        <template #append>
-          <v-text-field
-            :value="prefixLengthRange[1]"
-            class="mt-0 pt-0"
-            hide-details
-            single-line
-            type="number"
-            style="width: 60px"
-            @change="$set(prefixLengthRange, 1, $event)"
-          />
-        </template>
-      </v-range-slider>
-    </v-col>
-    <v-col cols="12" sm="8" md="8">
-      <v-card>
-        <v-card-text>
-          <v-row no-gutters class="routes-header">
-            <v-col cols="3" xs="3" md="2">
-              <h4>IP Block</h4>
-            </v-col>
-            <v-col class="hidden-md-and-down">
-              <h4>AS Path</h4>
-            </v-col>
-            <v-col>
-              <h4>Origin</h4>
-            </v-col>
-          </v-row>
-          <v-virtual-scroll
-            height="500"
-            item-height="16"
-            :items="filteredRoutes"
-            style="overflow-y: overlay;"
-          >
-            <template #default="{ item }">
-              <v-row no-gutters class="route-item black--text">
-                <v-col cols="3" md="2">
-                  {{ item.block }}
-                </v-col>
-                <v-col class="text-truncate hidden-md-and-down">
-                  {{ item.path.join(', ') }}
-                </v-col>
-                <v-col class="text-truncate">
-                  {{ item.origin }} - {{ item.name }}
-                </v-col>
-              </v-row>
-            </template>
-          </v-virtual-scroll>
-          <hr class="my-3">
-          <div class="text-xs-right">
-            <em><small>Showing {{ filteredRoutes.length }} routes.</small></em>
-          </div>
-        </v-card-text>
-      </v-card>
-    </v-col>
-  </v-row>
+        <v-text-field
+          v-model="cidrBlockFilter"
+          label="IP Block:"
+          outlined
+          clearable
+          :rules="[validCIDR]"
+        />
+        <v-text-field
+          v-model="asPathFilter"
+          label="AS Path contains:"
+          outlined
+          clearable
+        />
+        <v-text-field
+          v-model="originFilter"
+          label="Origin AS:"
+          outlined
+          clearable
+        />
+        <p>Prefix Length:</p>
+        <v-range-slider
+          v-model="prefixLengthRange"
+          :max="maxPrefixLength"
+          :min="minPrefixLength"
+          hide-details
+          class="align-center"
+        >
+          <template #prepend>
+            <v-text-field
+              :value="prefixLengthRange[0]"
+              class="mt-0 pt-0"
+              hide-details
+              single-line
+              type="number"
+              style="width: 60px"
+              @change="$set(prefixLengthRange, 0, $event)"
+            />
+          </template>
+          <template #append>
+            <v-text-field
+              :value="prefixLengthRange[1]"
+              class="mt-0 pt-0"
+              hide-details
+              single-line
+              type="number"
+              style="width: 60px"
+              @change="$set(prefixLengthRange, 1, $event)"
+            />
+          </template>
+        </v-range-slider>
+      </v-col>
+      <v-col cols="12" sm="8" md="9">
+        <v-card>
+          <v-card-text>
+            <v-row no-gutters class="routes-header">
+              <v-col cols="3" xs="3" md="2">
+                <h4>IP Block</h4>
+              </v-col>
+              <v-col class="hidden-md-and-down">
+                <h4>AS Path</h4>
+              </v-col>
+              <v-col>
+                <h4>Origin</h4>
+              </v-col>
+            </v-row>
+            <v-virtual-scroll
+              height="500"
+              item-height="16"
+              :items="filteredRoutes"
+              style="overflow-y: overlay;"
+            >
+              <template #default="{ item }">
+                <v-row no-gutters class="route-item black--text">
+                  <v-col cols="3" md="2">
+                    {{ item.block }}
+                  </v-col>
+                  <v-col class="text-truncate hidden-md-and-down">
+                    {{ item.path.join(', ') }}
+                  </v-col>
+                  <v-col class="text-truncate">
+                    {{ item.origin }} - {{ item.name }}
+                  </v-col>
+                </v-row>
+              </template>
+            </v-virtual-scroll>
+            <hr class="my-3">
+            <div class="text-xs-right">
+              <em><small>Showing {{ filteredRoutes.length }} routes.</small></em>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </div>
 </template>
 
 <script>
@@ -108,6 +116,7 @@ export default {
   },
   data: () => ({
     announcements: [],
+    createdAt: null,
     loading: true,
     originFilter: null,
     asPathFilter: null,
@@ -118,9 +127,11 @@ export default {
     prefixLengthRange: [1, 48]
   }),
   async fetch () {
-    this.announcements = await this.$http.$get(
+    const response = await this.$http.$get(
       `/route-collectors/${this.$route.params.name}/snapshots/${this.$route.query.snapshot}/routes`
     )
+    this.announcements = response.routes
+    this.createdAt = new Date(Date.parse(response.metadata.created_at)).toUTCString()
 
     if (!this.announcements) {
       this.$nuxt.error({ statusCode: 404, message: 'Data not found' })

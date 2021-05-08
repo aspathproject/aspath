@@ -114,6 +114,14 @@ export default {
 </script>
 <style>
 
+h1 {
+   font-weight: 400;
+}
+
+h3 {
+   font-weight: 400;
+}
+
 a.v-breadcrumbs__item{
   color: black!important;
 }

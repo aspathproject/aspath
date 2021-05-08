@@ -23,7 +23,7 @@
                   v-slot="{ hover }"
                 >
                   <v-card
-                    class="px-4 my-1"
+                    class="pa-6 my-1"
                     :elevation="hover ? 3 : 2"
                   >
                     <v-row align="center" class="spacer">

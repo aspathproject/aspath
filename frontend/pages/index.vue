@@ -13,7 +13,9 @@
         </p>
       </v-card-text>
     </v-card>
-    <h2 class="mt-2">Database Statistics</h2>
+    <h2 class="mt-2">
+      Database Statistics
+    </h2>
     <div v-if="statistics" style="display: flex">
       <div style="display: flex">
         <v-card class="my-2 mr-2 text-center">
