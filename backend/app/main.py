@@ -4,6 +4,8 @@ from masoniteorm.query import QueryBuilder
 from brotli_asgi import BrotliMiddleware
 from redisbeat.scheduler import RedisScheduler
 from config.database import DB
+from datetime import timezone
+
 import worker
 
 app = FastAPI()
@@ -52,7 +54,6 @@ def exchange_points_index():
       last_update = QueryBuilder().table("routing_snapshots").select('route_collector_id', 'id, created_at').where_in('route_collector_id', collector_ids) \
                       .order_by('created_at', 'desc') \
                       .limit(1).first()
-      print(last_update['created_at'])
 
       exchange_points[ixp['id']]['route_collectors'] = len(collector_ids)
       exchange_points[ixp['id']]['last_snapshot_date'] = last_update['created_at'].strftime('%Y-%m-%d')
@@ -85,8 +86,17 @@ def get_snapshot_routes(collector_name: str):
     if not snapshot:
       raise HTTPException(status_code=404, detail="Routing snapshot not found")
 
-    return QueryBuilder().table("ip_routes").where({'created_at': snapshot['created_at'], 'snapshot_id': snapshot['id']}).get()
+    query = """SELECT "ip_routes"."block", "ip_routes"."path", path->>-1 origin, "autonomous_systems"."name"
+FROM "ip_routes", "autonomous_systems"
+WHERE "ip_routes"."created_at" = '?'
+AND cast(nullif("ip_routes"."path"->>-1, '') as int) = "autonomous_systems"."number"
+AND "ip_routes"."snapshot_id" = '?'
+    """
+    snapshot_metadata = {}
+    snapshot_metadata['created_at'] = snapshot['created_at'].replace(tzinfo=timezone.utc)
 
+    routes = QueryBuilder().statement(query, [snapshot['created_at'], snapshot['id']])
+    return { "metadata": snapshot_metadata, "routes": routes }
 
 @app.get("/route-collectors/{collector_name}/snapshots/{snapshot_id}/routes")
 def get_snapshot_routes(collector_name: str, snapshot_id: int):
@@ -105,8 +115,12 @@ WHERE "ip_routes"."created_at" = '?'
 AND cast(nullif("ip_routes"."path"->>-1, '') as int) = "autonomous_systems"."number"
 AND "ip_routes"."snapshot_id" = '?'
     """
-    return QueryBuilder().statement(query, [snapshot['created_at'], snapshot['id']])
-    return QueryBuilder().table("ip_routes").select('block', 'path').select_raw('path->>-1 origin').where({'created_at': snapshot['created_at'], 'snapshot_id': snapshot['id']}).get()
+
+    snapshot_metadata = {}
+    snapshot_metadata['created_at'] = snapshot['created_at'].replace(tzinfo=timezone.utc)
+
+    routes = QueryBuilder().statement(query, [snapshot['created_at'], snapshot['id']])
+    return { "metadata": snapshot_metadata, "routes": routes }
 
 @app.get("/statistics")
 def get_database_statistics():
