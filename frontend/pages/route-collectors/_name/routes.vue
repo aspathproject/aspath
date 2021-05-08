@@ -2,9 +2,46 @@
   <div>
     <div class="heading mb-2" style="display: flex; place-content: space-between; align-items: center;">
       <h1>Snapshot Routes</h1>
-      <p class="mb-0">
-        Current snapshot: {{ createdAt }}
-      </p>
+
+      <div style="min-width: 320px;">
+        <v-autocomplete
+          v-model="selectedSnapshot"
+          :items="snapshots"
+          :loading="isSnapshotListLoading"
+          :search-input.sync="searchSnapshot"
+          chips
+          hide-details
+          hide-selected
+          item-text="created_at"
+          item-value="id"
+          :label="createdAt"
+          solo
+        >
+          <template #no-data>
+            <v-list-item>
+              <v-list-item-title>
+                No snapshots found
+              </v-list-item-title>
+            </v-list-item>
+          </template>
+          <template #selection="{ attr, on, item, selected }">
+            <v-chip
+              v-bind="attr"
+              :input-value="selected"
+              color="blue-grey"
+              class="white--text"
+              v-on="on"
+            >
+              <span v-text="item.created_at" />
+            </v-chip>
+          </template>
+          <template #item="{ item }">
+            <v-list-item-content>
+              <v-list-item-title v-text="item.created_at" />
+            </v-list-item-content>
+          </template>
+        </v-autocomplete>
+      </div>
     </div>
     <v-row justify="center" align="start">
       <v-col md="3">
@@ -117,6 +154,10 @@ export default {
   data: () => ({
     announcements: [],
     createdAt: null,
+    selectedSnapshot: null,
+    searchSnapshot: null,
+    snapshots: [],
+    isSnapshotListLoading: false,
     loading: true,
     originFilter: null,
     asPathFilter: null,
@@ -127,11 +168,19 @@ export default {
     prefixLengthRange: [1, 48]
   }),
   async fetch () {
-    const response = await this.$http.$get(
+    const snapshotsResponse = await this.$http.$get(
+      `/route-collectors/${this.$route.params.name}/snapshots/`
+    )
+    this.snapshots = snapshotsResponse.map((snapshot) => {
+      return { id: snapshot.id, created_at: new Date(Date.parse(snapshot.created_at)).toUTCString() }
+    })
+
+    const routesResponse = await this.$http.$get(
       `/route-collectors/${this.$route.params.name}/snapshots/${this.$route.query.snapshot}/routes`
     )
-    this.announcements = response.routes
-    this.createdAt = new Date(Date.parse(response.metadata.created_at)).toUTCString()
+    this.announcements = routesResponse.routes
+    this.createdAt = new Date(Date.parse(routesResponse.metadata.created_at)).toUTCString()
+    this.selectedSnapshot = routesResponse.metadata.snapshot_id
 
     if (!this.announcements) {
       this.$nuxt.error({ statusCode: 404, message: 'Data not found' })
@@ -171,7 +220,28 @@ export default {
     }
   },
   watch: {
+    selectedSnapshot (val) {
+      if (val !== this.$route.query.snapshot) {
+        this.$router.push({ query: { snapshot: val } })
+        this.$fetch()
+      }
+    },
+    searchSnapshot (val) {
+      // Items have already been loaded
+      if (this.snapshots.length > 0) { return }
 
+      this.isSnapshotListLoading = true
+
+      // Lazily load input items
+      this.$http.$get(`/route-collectors/${this.$route.params.name}/snapshots/`)
+        .then((res) => {
+          this.snapshots = res
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+        .finally(() => (this.isSnapshotListLoading = false))
+    }
   },
   created () {
     if (!this.$route.query.snapshot) {
