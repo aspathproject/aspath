@@ -94,6 +94,7 @@ AND "ip_routes"."snapshot_id" = '?'
     """
     snapshot_metadata = {}
     snapshot_metadata['created_at'] = snapshot['created_at'].replace(tzinfo=timezone.utc)
+    snapshot_metadata['snapshot_id'] = snapshot['id']
 
     routes = QueryBuilder().statement(query, [snapshot['created_at'], snapshot['id']])
     return { "metadata": snapshot_metadata, "routes": routes }
@@ -118,6 +119,7 @@ AND "ip_routes"."snapshot_id" = '?'
 
     snapshot_metadata = {}
     snapshot_metadata['created_at'] = snapshot['created_at'].replace(tzinfo=timezone.utc)
+    snapshot_metadata['snapshot_id'] = snapshot['id']
 
     routes = QueryBuilder().statement(query, [snapshot['created_at'], snapshot['id']])
     return { "metadata": snapshot_metadata, "routes": routes }
