@@ -18,7 +18,7 @@
             :key="exchange.id"
           >
             <v-col>
-              <NuxtLink :to="exchange.slug" style="text-decoration: none">
+              <NuxtLink :to="'/internet-exchanges/' + exchange.slug" style="text-decoration: none">
                 <v-hover
                   v-slot="{ hover }"
                 >
@@ -54,13 +54,21 @@
                           last updated: <span>{{ exchange.last_snapshot_date }}</span>
                         </p>
                       </v-col>
-                      <v-col v-if="exchange.last_snapshot_collector_name">
+                      <v-col>
                         <NuxtLink
+                          v-if="exchange.last_snapshot_collector_name"
                           style="text-decoration: none; color: inherit;"
                           :to="'/route-collectors/' + exchange.last_snapshot_collector_name + '/routes?snapshot=' + exchange.last_snapshot_id"
                         >
-                          <v-btn>Go to last snapshot</v-btn>
+                          <v-btn
+                            color="primary"
+                          >
+                            Go to last snapshot
+                          </v-btn>
                         </NuxtLink>
+                        <v-btn v-else>
+                          No snapshot available
+                        </v-btn>
                       </v-col>
                     </v-row>
                   </v-card>
@@ -98,7 +106,7 @@ export default {
     ]
   }),
   async fetch () {
-    this.internet_exchanges = await this.$http.$get('/exchange-points')
+    this.internet_exchanges = await this.$http.$get('/exchange-points/')
   }
 }
 </script>
