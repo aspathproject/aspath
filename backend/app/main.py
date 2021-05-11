@@ -56,9 +56,10 @@ def exchange_points_index():
                       .limit(1).first()
 
       exchange_points[ixp['id']]['route_collectors'] = len(collector_ids)
-      exchange_points[ixp['id']]['last_snapshot_date'] = last_update['created_at'].strftime('%Y-%m-%d')
-      exchange_points[ixp['id']]['last_snapshot_id'] = last_update['id']
-      exchange_points[ixp['id']]['last_snapshot_collector_name'] = route_collectors_dict[last_update['route_collector_id']]
+      if last_update:
+        exchange_points[ixp['id']]['last_snapshot_date'] = last_update['created_at'].strftime('%Y-%m-%d')
+        exchange_points[ixp['id']]['last_snapshot_id'] = last_update['id']
+        exchange_points[ixp['id']]['last_snapshot_collector_name'] = route_collectors_dict[last_update['route_collector_id']]
     return exchange_points
 
 @app.get("/route-collectors/")
