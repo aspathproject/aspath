@@ -5,9 +5,12 @@ from brotli_asgi import BrotliMiddleware
 from redisbeat.scheduler import RedisScheduler
 from config.database import DB
 from datetime import timezone
-
+from celery.schedules import crontab
+import toml
 import worker
+import logging
 
+logger = logging.getLogger("api")
 app = FastAPI()
 app.add_middleware(BrotliMiddleware)
 app.add_middleware(
@@ -18,7 +21,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-scheduler = RedisScheduler(app=worker.app)
+@app.on_event('startup')
+async def startup():
+  # wipe scheduled tasks at every boot
+  scheduler = RedisScheduler(app=worker.app)
+  logger.info("Wiping scheduled tasks...")
+  for task in scheduler.list():
+    scheduler.remove(task.name)
+
+  with open('configuration/aspath.toml') as fh:
+    aspath_config = toml.load(fh)
+
+  logger.info(aspath_config)
+
+  # Setup grab&ingest schedule
+  for grabber in aspath_config["grabbers"]:
+    hour = aspath_config["grabbers"][grabber]["hour"]
+    minutes = aspath_config["grabbers"][grabber]["minutes"]
+    scheduler.add(**{ "name": "grab-" + grabber, "schedule": crontab(hour=hour, minute=minutes), "task": 'worker.grab_and_ingest', "args": (grabber,) })
+  logger.info("New scheduler config:")
+  for task in scheduler.list():
+    logger.info(task)
 
 @app.get("/")
 def read_root():
