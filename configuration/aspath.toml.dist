@@ -1,0 +1,13 @@
+[grabbers]
+## Configuration example for 2 route-collectors. Please note the route-collectors must be added manually
+## with SQL queries in order to make grabbers work.
+
+#  [grabbers."route-collector.scl.pch.net"]
+#  # run at 6:34 AM everyday
+#  hour = 6
+#  minutes = 34
+
+#  [grabbers."route-collector.ros.pch.net"]
+#  # run at 6:50 AM everyday
+#  hour = 6
+#  minutes = 50

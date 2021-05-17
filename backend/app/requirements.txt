@@ -1,7 +1,10 @@
-# masonite-orm==1.0.45
-git+git://github.com/rodrigopv/orm@c06192e#egg=masonite-orm
+masonite-orm==1.0.47
 psycopg2-binary==2.8.6
 brotli-asgi==1.1.0
 redis==3.5.3
 celery==5.0.5
 redisbeat==1.2.4
+toml==0.10.2
+beautifulsoup4==4.9.3
+urllib3==1.26.4
+lxml==4.6.3

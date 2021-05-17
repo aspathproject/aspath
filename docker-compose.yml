@@ -11,6 +11,7 @@ services:
       - backend
     volumes:
       - ./backend/app:/app
+      - ./configuration:/app/configuration
     entrypoint: /start-reload.sh
     ports:
       - "8000:80"
@@ -33,6 +34,8 @@ services:
       context: ./backend
     depends_on:
       - redis
+      - celery_worker
+      - backend
     volumes:
       - ./backend/app:/app
     networks:
@@ -44,6 +47,7 @@ services:
       context: ./backend
     depends_on:
       - redis
+      - backend
     volumes:
       - ./backend/app:/app
     networks:
@@ -73,6 +77,4 @@ services:
 
 networks:
   backend:
-    name: backend-net
   frontend:
-    name: frontend-net
