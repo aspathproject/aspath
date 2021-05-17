@@ -88,22 +88,7 @@ export default {
   components: {
   },
   data: () => ({
-    internet_exchanges: [
-      {
-        name: 'PIT Chile',
-        route_collectors: 1,
-        prefix_count: '15.000',
-        last_snapshot: 'december 23th, 2020',
-        slug: 'pit-chile'
-      },
-      {
-        name: 'IX.BR',
-        route_collectors: 0,
-        prefix_count: 'unknown',
-        last_snapshot: 'never',
-        slug: 'ix-br'
-      }
-    ]
+    internet_exchanges: []
   }),
   async fetch () {
     this.internet_exchanges = await this.$http.$get('/exchange-points/')
