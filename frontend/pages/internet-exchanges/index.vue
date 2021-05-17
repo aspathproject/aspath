@@ -3,13 +3,13 @@
     <v-col cols="12">
       <v-row no-gutters>
         <h1>Internet Exchanges</h1>
-        <v-row v-if="internet_exchanges.length === 0" justify="center" align="center">
-          <v-col>
-            <v-card class="text-center my-8">
-              <v-card-text><span class="text-primary text-body-1">No internet exchanges found</span></v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
+      </v-row>
+      <v-row v-if="internet_exchanges.length === 0" justify="center" align="center">
+        <v-col>
+          <v-card class="text-center my-8">
+            <v-card-text><span class="text-primary text-body-1">No internet exchanges found</span></v-card-text>
+          </v-card>
+        </v-col>
       </v-row>
       <v-row>
         <v-col>
