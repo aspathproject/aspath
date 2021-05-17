@@ -51,14 +51,6 @@ def read_root():
 def get_scheduler_list():
     return scheduler.list()
 
-@app.delete("/scheduler/")
-def wipe_scheduler():
-    removed_tasks = []
-    for task in scheduler.list():
-      removed_tasks.append(task.name)
-      scheduler.remove(task.name)
-    return removed_tasks
-
 @app.get("/exchange-points/")
 def exchange_points_index():
     exchange_points = {}
