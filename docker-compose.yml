@@ -23,8 +23,9 @@ services:
       - backend
     networks:
       - frontend
-    # volumes:
-    #   - ./frontend:/app
+      - backend
+#     volumes:
+#      - ./frontend:/app
     ports:
       - "8080:8080"
 
