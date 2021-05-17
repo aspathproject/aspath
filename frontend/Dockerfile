@@ -10,6 +10,6 @@ COPY . /app
 ENV HOST=0.0.0.0
 ENV PORT=8080
 
-RUN yarn generate
+RUN yarn build
 
 CMD [ "yarn", "start" ]

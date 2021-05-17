@@ -3,7 +3,7 @@ import colors from 'vuetify/es5/util/colors'
 export default {
   // Target: https://go.nuxtjs.dev/config-target
   ssr: false,
-  target: 'static',
+  target: 'server',
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -43,11 +43,19 @@ export default {
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
-    '@nuxt/http'
+    '@nuxt/http',
+    '@nuxtjs/proxy'
   ],
 
   http: {
-    baseURL: 'http://backend:80'
+    baseURL: '/api'
+  },
+
+  proxy: {
+    '/api/': {
+      target: 'http://backend',
+      pathRewrite: { '^/api/': '' }
+    }
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
