@@ -20,11 +20,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+scheduler = RedisScheduler(app=worker.app)
+
 
 @app.on_event('startup')
 async def startup():
   # wipe scheduled tasks at every boot
-  scheduler = RedisScheduler(app=worker.app)
   logger.info("Wiping scheduled tasks...")
   for task in scheduler.list():
     scheduler.remove(task.name)
