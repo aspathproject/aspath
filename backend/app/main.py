@@ -80,8 +80,18 @@ def exchange_points_index():
 
 @app.get("/route-collectors/")
 def route_collectors_index():
-    builder = QueryBuilder().table("route_collectors")
-    return builder.all()
+    collector_results = QueryBuilder().table("route_collectors").get()
+    route_collectors = {}
+    for collector in collector_results:
+      print(collector)
+      route_collectors[collector['name']] = collector
+      last_snapshot = QueryBuilder().table('routing_snapshots').where({'route_collector_id': collector['id'], 'status': 'parsed'}) \
+                         .order_by('created_at', 'desc') \
+                         .limit(1).first()
+      if last_snapshot:
+        route_collectors[collector['name']]['last_snapshot_date'] = last_snapshot['created_at'].strftime('%Y-%m-%d')
+        route_collectors[collector['name']]['last_snapshot_id'] = last_snapshot['id']
+    return route_collectors
 
 @app.get("/route-collectors/{collector_name}/snapshots/")
 def get_route_collector_snapshots(collector_name: str):
