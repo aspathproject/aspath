@@ -102,11 +102,10 @@ def get_snapshot_routes(collector_name: str):
     snapshot = QueryBuilder().table("routing_snapshots").where('route_collector_id', route_collector_id).last('id')
     if not snapshot:
       raise HTTPException(status_code=404, detail="Routing snapshot not found")
-
-    query = """SELECT "ip_routes"."block", "ip_routes"."path", path->>-1 origin, "autonomous_systems"."name"
-FROM "ip_routes", "autonomous_systems"
+    query = """SELECT "ip_routes"."block", "ip_routes"."path", path->>-1 origin, "as2"."name"
+FROM "ip_routes"
+LEFT JOIN "autonomous_systems" as2 on ip_routes.path->>-1 = as2.number::text
 WHERE "ip_routes"."created_at" = '?'
-AND cast(nullif("ip_routes"."path"->>-1, '') as int) = "autonomous_systems"."number"
 AND "ip_routes"."snapshot_id" = '?'
     """
     snapshot_metadata = {}
@@ -127,10 +126,10 @@ def get_snapshot_routes(collector_name: str, snapshot_id: int):
     if not snapshot:
       raise HTTPException(status_code=404, detail="Routing snapshot not found")
 
-    query = """SELECT "ip_routes"."block", "ip_routes"."path", path->>-1 origin, "autonomous_systems"."name"
-FROM "ip_routes", "autonomous_systems"
+    query = """SELECT "ip_routes"."block", "ip_routes"."path", path->>-1 origin, "as2"."name"
+FROM "ip_routes"
+LEFT JOIN "autonomous_systems" as2 on ip_routes.path->>-1 = as2.number::text
 WHERE "ip_routes"."created_at" = '?'
-AND cast(nullif("ip_routes"."path"->>-1, '') as int) = "autonomous_systems"."number"
 AND "ip_routes"."snapshot_id" = '?'
     """
 
