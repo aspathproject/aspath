@@ -6,8 +6,12 @@
 #  # run at 6:34 AM everyday
 #  hour = 6
 #  minutes = 34
+   ## store routes marked as inactive on route-collector (default: false)
+#  store_inactive_routes = false
 
 #  [grabbers."route-collector.ros.pch.net"]
 #  # run at 6:50 AM everyday
 #  hour = 6
 #  minutes = 50
+   ## store routes marked as inactive on route-collector (default: false)
+#  store_inactive_routes = false
